@@ -1,11 +1,12 @@
 import type { Component } from "solid-js";
 
-const Page: Component = () => {
+import Page from "@/core/components/PageTemplate";
+
+const SecretSantaPage: Component = () => {
   return (
-    <div class="page">
-      <h1>Secret Santa</h1>
-    </div>
+    <Page title="Secret Santa">
+    </Page>
   );
 };
 
-export default Page;
+export default SecretSantaPage;

@@ -1,11 +1,9 @@
 import type { Component } from "solid-js";
 
-const Page: Component = () => {
-  return (
-    <div class="page">
-      <h1>Squawk!</h1>
-    </div>
-  );
+import Page from "@/core/components/PageTemplate";
+
+const HomePage: Component = () => {
+  return <Page title="Home" />;
 };
 
-export default Page;
+export default HomePage;

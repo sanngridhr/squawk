@@ -1,12 +1,15 @@
 import type { Component } from "solid-js";
 
-const Page: Component = () => {
+import Page from "@/core/components/PageTemplate";
+
+const NotFoundPage: Component = () => {
   return (
-    <div class="page page--error">
-      <h1>Error 404</h1>
-      <p>We could not find the page you were looking for.</p>
+    <div class="page--error">
+      <Page title="Not found">
+        <p>The page you were looking for was not found.</p>
+      </Page>
     </div>
   );
 };
 
-export default Page;
+export default NotFoundPage;

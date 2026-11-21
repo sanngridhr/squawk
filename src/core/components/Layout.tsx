@@ -30,7 +30,7 @@ const Logo: Component = () => (
   </svg>
 );
 
-const Layout = (props: RouteSectionProps) => {
+const Layout: Component<RouteSectionProps> = (props: RouteSectionProps) => {
   const [theme, setTheme] = createSignal<Theme>(storedTheme() ?? systemTheme());
 
   onSettled(() => {
@@ -61,7 +61,7 @@ const Layout = (props: RouteSectionProps) => {
       <header class="topbar">
         <a href="/" class="logo-button">
           <Logo />
-          <span>Squawk</span>
+          <span>Squawk!</span>
         </a>
         <div class="topbar-actions">
           <nav class="topbar-nav">

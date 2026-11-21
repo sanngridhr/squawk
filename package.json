@@ -1,5 +1,5 @@
 {
-  "name": "example-bare",
+  "name": "squawk",
   "version": "0.0.0",
   "description": "",
   "type": "module",
@@ -24,6 +24,7 @@
     "vite": "^8.3.8"
   },
   "dependencies": {
+    "@solidjs/meta": "^2.0.0",
     "@solidjs/router": "^2.0.1",
     "@solidjs/web": "^2.0.0",
     "@supabase/supabase-js": "^2.119.2",
