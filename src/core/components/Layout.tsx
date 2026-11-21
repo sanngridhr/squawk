@@ -2,6 +2,8 @@ import type { RouteSectionProps } from "@solidjs/router";
 import type { Component } from "solid-js";
 import { createSignal, onSettled } from "solid-js";
 
+import ErrorBoundary from "@/core/components/ErrorBoundary";
+
 // theme
 type Theme = "light" | "dark";
 
@@ -79,7 +81,7 @@ const Layout: Component<RouteSectionProps> = (props: RouteSectionProps) => {
           </button>
         </div>
       </header>
-      {props.children}
+      <ErrorBoundary>{props.children}</ErrorBoundary>
     </div>
   );
 };
