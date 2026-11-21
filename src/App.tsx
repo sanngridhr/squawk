@@ -8,7 +8,7 @@ import {
 } from "@solidjs/router";
 import { type Component, lazy } from "solid-js";
 
-import Layout from "@/components/Layout";
+import Layout from "@/core/components/Layout";
 
 const routes: RouteDefinition[] = defineRoutes([
   { path: "/", component: lazy(() => import("@/pages/Home")) },
