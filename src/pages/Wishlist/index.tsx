@@ -3,13 +3,14 @@ import { createMemo, For } from "solid-js";
 
 import Page from "@/core/components/PageTemplate";
 import { supabase } from "@/core/supabase";
+import { Wish, wishSchema } from "@/core/schemas/wishlist";
 
 const WishlistPage: Component = () => {
-  const wishlist: Accessor<any[]> = createMemo(async () => {
-    const { data, error } = await supabase.from("wishlists").select();
+  const wishlist: Accessor<Wish[]> = createMemo(async () => {
+    const { data, error } = await supabase.schema("wishlist").from("wishes").select();
 
     if (error) throw error;
-    return data;
+    return data.map((w): Wish => wishSchema.parse(w));
   });
 
   return (

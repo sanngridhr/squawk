@@ -24,6 +24,7 @@
     "vite": "^8.3.8"
   },
   "dependencies": {
+    "@auth0/auth0-spa-js": "^2.30.0",
     "@solidjs/meta": "^2.0.0",
     "@solidjs/router": "^2.0.1",
     "@solidjs/web": "^2.0.0",
