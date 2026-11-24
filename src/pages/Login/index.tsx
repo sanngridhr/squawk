@@ -11,7 +11,7 @@ type Mode = "signin" | "signup";
 
 const OAUTH_PROVIDERS = [
   { provider: "google", label: "Google" },
-  { provider: "discord", label: "Discord" }
+  { provider: "discord", label: "Discord" },
 ] as const;
 
 const Login: Component = () => {

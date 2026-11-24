@@ -72,14 +72,14 @@ const Layout: Component<RouteSectionProps> = (props: RouteSectionProps) => {
         </a>
         <div class="topbar-actions">
           <nav class="topbar-nav">
-          <button
-            type="button"
-            class="theme-toggle"
-            onClick={toggleTheme}
-            aria-label={`Switch to ${target()} theme`}
-          >
-            {TOGGLE_LABEL[target()]}
-          </button>
+            <button
+              type="button"
+              class="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${target()} theme`}
+            >
+              {TOGGLE_LABEL[target()]}
+            </button>
             <a href="/">Home</a>
             <a href="/secret-santa">Secret Santa</a>
             <a href="/wishlist">Wishlist</a>

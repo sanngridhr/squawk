@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import solid from '@solidjs/vite-plugin';
+import { defineConfig } from "vite";
+import solid from "@solidjs/vite-plugin";
 
 export default defineConfig({
   plugins: [solid({ start: true, diagnostics: true })],
@@ -7,10 +7,10 @@ export default defineConfig({
     port: 3000,
   },
   build: {
-    target: 'esnext',
+    target: "esnext",
     assetsInlineLimit: 0,
   },
   resolve: {
     tsconfigPaths: true,
-  }
+  },
 });

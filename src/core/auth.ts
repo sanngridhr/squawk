@@ -36,7 +36,7 @@ export const auth = {
    * finish there. On success supabase-js navigates the browser away.
    */
   signInWithOAuth: (provider: Provider, next?: string) => {
-    if (next !== undefined) {
+    if (next != undefined) {
       try {
         sessionStorage.setItem(NEXT_KEY, next);
       } catch {
@@ -68,5 +68,5 @@ export const auth = {
 
   /** Only same-site paths (`/…`, never `//host`) are valid redirect targets. */
   nextTarget: (value: unknown): string =>
-    typeof value === "string" && value.startsWith("/") && !value.startsWith("//") ? value : "/",
+    typeof value == "string" && value.startsWith("/") && !value.startsWith("//") ? value : "/",
 };
