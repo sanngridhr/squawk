@@ -12,6 +12,8 @@ import Layout from "@/core/components/Layout";
 
 const routes: RouteDefinition[] = defineRoutes([
   { path: "/", component: lazy(() => import("@/pages/Home")) },
+  { path: "/login", component: lazy(() => import("@/pages/Login")) },
+  { path: "/auth/callback", component: lazy(() => import("@/pages/AuthCallback")) },
   { path: "/secret-santa", component: lazy(() => import("@/pages/SecretSanta")) },
   { path: "/wishlist", component: lazy(() => import("@/pages/Wishlist")) },
   {

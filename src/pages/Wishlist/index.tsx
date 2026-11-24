@@ -1,24 +1,12 @@
-import type { Accessor, Component } from "solid-js";
-import { createMemo, For } from "solid-js";
+import type { Component } from "solid-js";
 
 import Page from "@/core/components/PageTemplate";
-import { supabase } from "@/core/supabase";
-import { Wish, wishSchema } from "@/core/schemas/wishlist";
+import RequireAuth from "@/core/components/RequireAuth";
 
-const WishlistPage: Component = () => {
-  const wishlist: Accessor<Wish[]> = createMemo(async () => {
-    const { data, error } = await supabase.schema("wishlist").from("wishes").select();
-
-    if (error) throw error;
-    return data.map((w): Wish => wishSchema.parse(w));
-  });
-
-  return (
-    <Page title="Wishlist">
-      <h2>Your wishes:</h2>
-      <For each={wishlist()}>{(wish: any) => <p>{wish}</p>}</For>
-    </Page>
-  );
-};
+const WishlistPage: Component = () => (
+  <RequireAuth>
+    <Page title="Wishlist" />
+  </RequireAuth>
+);
 
 export default WishlistPage;

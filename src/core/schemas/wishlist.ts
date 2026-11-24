@@ -5,6 +5,6 @@ export const wishSchema = z.object({
   createdAt: z.iso.datetime(),
   name: z.string(),
   gifted: z.boolean(),
-  gifter: z.string().nullable()
-})
+  gifter: z.string().nullable(),
+});
 export type Wish = z.infer<typeof wishSchema>;

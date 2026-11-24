@@ -1,7 +1,8 @@
 import type { RouteSectionProps } from "@solidjs/router";
 import type { Component } from "solid-js";
-import { createSignal, onSettled } from "solid-js";
+import { createSignal, Loading, onSettled, Show } from "solid-js";
 
+import { auth } from "@/core/auth";
 import ErrorBoundary from "@/core/components/ErrorBoundary";
 
 // theme
@@ -58,6 +59,10 @@ const Layout: Component<RouteSectionProps> = (props: RouteSectionProps) => {
 
   const target = () => (theme() === "dark" ? "light" : "dark");
 
+  const signOut = (): void => {
+    void auth.signOut();
+  };
+
   return (
     <div>
       <header class="topbar">
@@ -67,10 +72,6 @@ const Layout: Component<RouteSectionProps> = (props: RouteSectionProps) => {
         </a>
         <div class="topbar-actions">
           <nav class="topbar-nav">
-            <a href="/">Home</a>
-            <a href="/secret-santa">Secret Santa</a>
-            <a href="/wishlist">Wishlist</a>
-          </nav>
           <button
             type="button"
             class="theme-toggle"
@@ -79,9 +80,28 @@ const Layout: Component<RouteSectionProps> = (props: RouteSectionProps) => {
           >
             {TOGGLE_LABEL[target()]}
           </button>
+            <a href="/">Home</a>
+            <a href="/secret-santa">Secret Santa</a>
+            <a href="/wishlist">Wishlist</a>
+          </nav>
+          <Show
+            when={auth.user()}
+            fallback={
+              <a href="/login" class="signin-link">
+                Sign in
+              </a>
+            }
+          >
+            <span class="auth-user">{auth.user()?.email}</span>
+            <button type="button" class="signout-toggle" onClick={signOut}>
+              Sign out
+            </button>
+          </Show>
         </div>
       </header>
-      <ErrorBoundary>{props.children}</ErrorBoundary>
+      <ErrorBoundary>
+        <Loading fallback={<p>Loading...</p>}>{props.children}</Loading>
+      </ErrorBoundary>
     </div>
   );
 };
