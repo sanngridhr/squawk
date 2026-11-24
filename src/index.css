@@ -210,6 +210,10 @@ svg {
   padding: clamp(2rem, 6vw, 3.5rem) clamp(1rem, 4vw, 2.5rem) 4rem;
 }
 
+.page--wide {
+  max-width: 72rem;
+}
+
 .page h1 {
   margin: 0 0 1.25rem;
   font-size: clamp(1.9rem, 5vw, 2.6rem);
@@ -255,8 +259,7 @@ svg {
 }
 
 .auth-form,
-.wish-form,
-.wish-edit-form {
+.wish-row-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -265,8 +268,7 @@ svg {
 }
 
 .auth-form label,
-.wish-form label,
-.wish-edit-form label {
+.wish-row-form label {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -277,8 +279,7 @@ svg {
 }
 
 .auth-form input,
-.wish-form input,
-.wish-edit-form input {
+.wish-row-form input {
   padding: 0.5rem 0.7rem;
   font-family: inherit;
   font-size: 1rem;
@@ -290,8 +291,7 @@ svg {
 }
 
 .auth-form button,
-.wish-form button,
-.wish-edit-form button {
+.wish-row-form button {
   padding: 0.55rem 1rem;
   font-family: inherit;
   font-size: 0.9rem;
@@ -307,15 +307,13 @@ svg {
 }
 
 .auth-form button:hover:not(:disabled),
-.wish-form button:hover:not(:disabled),
-.wish-edit-form button:hover:not(:disabled) {
+.wish-row-form button:hover:not(:disabled) {
   color: var(--re);
   border-color: var(--re);
 }
 
 .auth-form button:disabled,
-.wish-form button:disabled,
-.wish-edit-form button:disabled {
+.wish-row-form button:disabled {
   opacity: 0.55;
   cursor: progress;
 }
@@ -417,7 +415,7 @@ svg {
   color: var(--tx-2);
 }
 
-.wish-table td:last-child:not(.wish-edit-cell) {
+.wish-table td:last-child:not(.wish-row-cell) {
   text-align: right;
 }
 
@@ -460,7 +458,7 @@ svg {
 }
 
 /* Edit form: fields laid out across the row inside one <td colspan>. */
-.wish-edit-form {
+.wish-row-form {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -469,23 +467,24 @@ svg {
   margin: 0;
 }
 
-.wish-edit-form .wish-error {
+.wish-row-form .wish-error,
+.wish-row-form .wish-notice {
   flex-basis: 100%;
   margin: 0;
 }
 
-.wish-edit-form label {
+.wish-row-form label {
   flex: 1 1 10rem;
 }
 
-.wish-edit-form .wish-gifted {
+.wish-row-form .wish-gifted {
   flex: 0 0 auto;
   flex-direction: row;
   align-items: center;
   gap: 0.45rem;
 }
 
-.wish-edit-form input[type="checkbox"] {
+.wish-row-form input[type="checkbox"] {
   width: 1.05em;
   height: 1.05em;
   padding: 0;

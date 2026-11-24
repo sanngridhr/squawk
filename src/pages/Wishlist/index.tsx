@@ -32,7 +32,10 @@ const COMPARE: Record<SortKey, (a: Wish, b: Wish) => number> = {
 };
 
 const formatDate = (value: string): string =>
-  new Date(value).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  new Date(value).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 
 const WishlistPage: Component = () => {
   // Initial load. refresh(wishes) re-asks the same question after every
@@ -98,11 +101,11 @@ const WishlistPage: Component = () => {
   const saveEdit = async (event: SubmitEvent, wish: Wish): Promise<void> => {
     event.preventDefault();
 
-    const form = event.currentTarget as HTMLFormElement;
+    const fields = new FormData(event.currentTarget as HTMLFormElement);
     const parsed = updateWishSchema.safeParse({
-      name: String(form.get("name") ?? ""),
-      gifter: String(form.get("gifter") ?? ""),
-      gifted: form.get("gifted") != null,
+      name: String(fields.get("name") ?? ""),
+      gifter: String(fields.get("gifter") ?? ""),
+      gifted: fields.get("gifted") != null,
     });
     if (!parsed.success) {
       setEditError(parsed.error.issues[0]?.message ?? "Check your entries and try again.");
@@ -142,14 +145,16 @@ const WishlistPage: Component = () => {
 
     // currentTarget only exists during dispatch — capture before awaiting.
     const form = event.currentTarget as HTMLFormElement;
-    const parsed = createWishSchema.safeParse({ name: String(form.get("name") ?? "") });
+    const fields = new FormData(form);
+    const parsed = createWishSchema.safeParse({
+      name: String(fields.get("name") ?? ""),
+    });
     if (!parsed.success) {
       setCreateError(parsed.error.issues[0]?.message ?? "Check your entries and try again.");
       return;
     }
 
-    const user = auth.user();
-    if (user == null) {
+    if (auth.user() == null) {
       setCreateError("Your session expired — sign in again.");
       return;
     }
@@ -161,7 +166,6 @@ const WishlistPage: Component = () => {
       const now = new Date().toISOString();
       const { error: failure } = await supabase.from("wishes").insert({
         name: parsed.data.name,
-        user_id: user.id,
         gifted: false,
         gifter: null,
         created_at: now,
@@ -182,134 +186,140 @@ const WishlistPage: Component = () => {
 
   return (
     <RequireAuth>
-      <Page title="Wishlist">
+      <Page title="Wishlist" wide>
         <h2>Your wishes:</h2>
 
-        <Show when={sorted().length > 0} fallback={<p>No wishes yet — add one below.</p>}>
-          <div class="wish-wrap">
-            <table class="wish-table">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <For each={COLUMNS}>
-                    {(column) => (
-                      <th
-                        scope="col"
-                        aria-sort={
-                          sort().key == column.key
-                            ? sort().dir == 1
-                              ? "ascending"
-                              : "descending"
-                            : "none"
-                        }
-                      >
-                        <button
-                          type="button"
-                          class="wish-sort"
-                          onClick={() => toggleSort(column.key)}
-                        >
-                          {column.label}
-                          <Show when={sort().key == column.key}>
-                            <span aria-hidden="true">{sort().dir == 1 ? "↑" : "↓"}</span>
-                          </Show>
-                        </button>
-                      </th>
-                    )}
-                  </For>
-                  <th scope="col">
-                    <span class="visually-hidden">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <For each={sorted()}>
-                  {(wish, index) => (
-                    <Show
-                      when={editingId() == wish.id}
-                      fallback={
-                        <tr>
-                          <td>{index() + 1}</td>
-                          <td>{wish.name}</td>
-                          <td>{wish.gifted ? "Yes" : "No"}</td>
-                          <td>{wish.gifter ?? "—"}</td>
-                          <td>{formatDate(wish.created_at)}</td>
-                          <td>{formatDate(wish.updated_at)}</td>
-                          <td>
-                            <button type="button" onClick={() => startEdit(wish)}>
-                              Edit
-                            </button>
-                          </td>
-                        </tr>
+        <div class="wish-wrap">
+          <table class="wish-table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <For each={COLUMNS}>
+                  {(column) => (
+                    <th
+                      scope="col"
+                      aria-sort={
+                        sort().key == column.key
+                          ? sort().dir == 1
+                            ? "ascending"
+                            : "descending"
+                          : "none"
                       }
                     >
-                      <tr>
-                        <td colspan={7} class="wish-edit-cell">
-                          <form class="wish-edit-form" onSubmit={(event) => saveEdit(event, wish)}>
-                            <Show when={editError()}>
-                              <p class="wish-error" role="alert">
-                                {editError()}
-                              </p>
-                            </Show>
-
-                            <label>
-                              Name
-                              <input name="name" type="text" required value={wish.name} />
-                            </label>
-
-                            <label>
-                              Gifter
-                              <input
-                                name="gifter"
-                                type="text"
-                                placeholder="(none)"
-                                value={wish.gifter ?? ""}
-                              />
-                            </label>
-
-                            <label class="wish-gifted">
-                              <input name="gifted" type="checkbox" checked={wish.gifted} />
-                              Gifted
-                            </label>
-
-                            <button type="submit" disabled={editPending()}>
-                              Save
-                            </button>
-                            <button type="button" onClick={cancelEdit}>
-                              Cancel
-                            </button>
-                          </form>
-                        </td>
-                      </tr>
-                    </Show>
+                      <button
+                        type="button"
+                        class="wish-sort"
+                        onClick={() => toggleSort(column.key)}
+                      >
+                        {column.label}
+                        <Show when={sort().key == column.key}>
+                          <span aria-hidden="true">{sort().dir == 1 ? "↑" : "↓"}</span>
+                        </Show>
+                      </button>
+                    </th>
                   )}
                 </For>
-              </tbody>
-            </table>
-          </div>
-        </Show>
+                <th scope="col">
+                  <span class="visually-hidden">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <For each={sorted()}>
+                {(wish, index) => (
+                  <Show
+                    when={editingId() == wish.id}
+                    fallback={
+                      <tr>
+                        <td>{index() + 1}</td>
+                        <td>{wish.name}</td>
+                        <td>{wish.gifted ? "Yes" : "No"}</td>
+                        <td>{wish.gifter ?? "—"}</td>
+                        <td>{formatDate(wish.created_at)}</td>
+                        <td>{formatDate(wish.updated_at)}</td>
+                        <td>
+                          <button type="button" onClick={() => startEdit(wish)}>
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  >
+                    <tr>
+                      <td colspan={7} class="wish-row-cell">
+                        <form class="wish-row-form" onSubmit={(event) => saveEdit(event, wish)}>
+                          <Show when={editError()}>
+                            <p class="wish-error" role="alert">
+                              {editError()}
+                            </p>
+                          </Show>
 
-        <h2>Add a wish</h2>
-        <form class="wish-form" onSubmit={addWish}>
-          <Show when={createError()}>
-            <p class="wish-error" role="alert">
-              {createError()}
-            </p>
-          </Show>
-          <Show when={createNotice()}>
-            <p class="wish-notice" role="status">
-              {createNotice()}
-            </p>
-          </Show>
+                          <label>
+                            Name
+                            <input name="name" type="text" required value={wish.name} />
+                          </label>
 
-          <label>
-            Name
-            <input name="name" type="text" required autocomplete="off" />
-          </label>
+                          <label>
+                            Gifter
+                            <input
+                              name="gifter"
+                              type="text"
+                              placeholder="(none)"
+                              value={wish.gifter ?? ""}
+                            />
+                          </label>
 
-          <button type="submit" disabled={createPending()}>
-            Add wish
-          </button>
-        </form>
+                          <label class="wish-gifted">
+                            <input name="gifted" type="checkbox" checked={wish.gifted} />
+                            Gifted
+                          </label>
+
+                          <button type="submit" disabled={editPending()}>
+                            Save
+                          </button>
+                          <button type="button" onClick={cancelEdit}>
+                            Cancel
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  </Show>
+                )}
+              </For>
+              <tr>
+                <td colspan={7} class="wish-row-cell">
+                  <form class="wish-row-form" onSubmit={addWish}>
+                    <Show when={createError()}>
+                      <p class="wish-error" role="alert">
+                        {createError()}
+                      </p>
+                    </Show>
+                    <Show when={createNotice()}>
+                      <p class="wish-notice" role="status">
+                        {createNotice()}
+                      </p>
+                    </Show>
+
+                    <label>
+                      Name
+                      <input
+                        name="name"
+                        type="text"
+                        required
+                        placeholder="New wish…"
+                        autocomplete="off"
+                      />
+                    </label>
+
+                    <button type="submit" disabled={createPending()}>
+                      Add wish
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </Page>
     </RequireAuth>
   );

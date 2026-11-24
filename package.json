@@ -8,7 +8,8 @@
     "build": "vite build",
     "serve": "vite preview",
     "lint": "oxlint src",
-    "fmt": "oxfmt --check src"
+    "fmt": "oxfmt --write src",
+    "fmt:check": "oxfmt --check src"
   },
   "license": "MIT",
   "devDependencies": {
