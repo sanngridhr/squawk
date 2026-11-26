@@ -1,8 +1,5 @@
 import z from "zod";
 
-// Mirrors the live `wishes` table (snake_case). `id` is a large random
-// bigint, so it is selected as `id::text`: as a JSON number it would lose
-// precision above 2^53 and break `.eq("id", …)` filters.
 export const wishSchema = z.object({
   id: z.string(),
   created_at: z.iso.datetime({ offset: true }),
@@ -14,14 +11,26 @@ export const wishSchema = z.object({
 });
 export type Wish = z.infer<typeof wishSchema>;
 
-/** What the create-wish form submits. */
 export const createWishSchema = z.object({
-  name: z.string().trim().min(1, "Give your wish a name"),
+  name: z.string().trim().min(1, "Give your wish a name."),
 });
 
-/** What the per-row edit form submits; `gifted` comes from a checkbox. */
-export const updateWishSchema = z.object({
-  name: z.string().trim().min(1, "Name cannot be empty"),
-  gifter: z.string().trim(),
-  gifted: z.boolean(),
-});
+const updateWishBaseFields = {
+  name: z.string().trim().min(1, "Name cannot be empty."),
+}
+
+const updateWishGiftedSchema = z.object({
+  ...updateWishBaseFields,
+  gifted: z.literal(true),
+  gifter: z.string().nullable()
+})
+
+const updateWishUngiftedSchema = z.object({
+  ...updateWishBaseFields,
+  gifted: z.literal(false),
+  gifter: z.null("Ungifted wishes cannot have gifters.")
+})
+
+export const updateWishSchema = z.discriminatedUnion("gifted", [
+  updateWishGiftedSchema, updateWishUngiftedSchema
+])

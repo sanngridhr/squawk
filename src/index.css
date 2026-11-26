@@ -74,7 +74,9 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--tx);
-  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  font-family:
+    "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia,
+    serif;
   font-size: 1.0625rem;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
@@ -370,7 +372,31 @@ svg {
   border: 0;
 }
 
-/* The page column is 62ch — let the table scroll instead of wrapping. */
+.wish-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 0.6rem;
+}
+
+.wish-toolbar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--tx-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.wish-toolbar input[type="checkbox"] {
+  width: 1.05em;
+  height: 1.05em;
+  padding: 0;
+  accent-color: var(--re);
+  cursor: pointer;
+}
+
+/* Horizontal scroll only kicks in below the table's min-width. */
 .wish-wrap {
   overflow-x: auto;
   margin: 0 0 2rem;

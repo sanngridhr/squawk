@@ -5,7 +5,11 @@ import { auth } from "@/core/auth";
 import Page from "@/core/components/PageTemplate";
 import RequireAuth from "@/core/components/RequireAuth";
 import type { Wish } from "@/core/schemas/wishlist";
-import { createWishSchema, updateWishSchema, wishSchema } from "@/core/schemas/wishlist";
+import {
+  createWishSchema,
+  updateWishSchema,
+  wishSchema,
+} from "@/core/schemas/wishlist";
 import { supabase } from "@/core/supabase";
 
 type SortKey = "name" | "gifted" | "gifter" | "created_at" | "updated_at";
@@ -42,9 +46,7 @@ const WishlistPage: Component = () => {
   // write — a bare refresh is quiet, so the fresh list reveals itself
   // without the page falling back to <Loading>.
   const wishes = createMemo(async () => {
-    const { data, error } = await supabase
-      .from("wishes")
-      .select("id::text, user_id, name, gifted, gifter, created_at, updated_at");
+    const { data, error } = await supabase.from("wishes").select();
 
     if (error) throw error;
     return data.map((row): Wish => wishSchema.parse(row));
@@ -55,14 +57,21 @@ const WishlistPage: Component = () => {
     dir: -1,
   });
 
+  const [hideGifted, setHideGifted] = createSignal(false);
+
   const sorted = createMemo((): Wish[] => {
-    const rows = [...wishes()];
+    const hide = hideGifted();
+    const rows = wishes().filter((wish) => !hide || !wish.gifted);
     const { key, dir } = sort();
 
     rows.sort((a, b) => {
       const cmp = COMPARE[key](a, b);
       // Ids are random — as a tie-break they only need to be stable.
-      return (cmp != 0 ? cmp : a.id.localeCompare(b.id, undefined, { numeric: true })) * dir;
+      return (
+        (cmp != 0
+          ? cmp
+          : a.id.localeCompare(b.id, undefined, { numeric: true })) * dir
+      );
     });
 
     return rows;
@@ -70,7 +79,9 @@ const WishlistPage: Component = () => {
 
   const toggleSort = (key: SortKey): void => {
     setSort((current) =>
-      current.key == key ? { key, dir: current.dir == 1 ? -1 : 1 } : { key, dir: 1 }
+      current.key == key
+        ? { key, dir: current.dir == 1 ? -1 : 1 }
+        : { key, dir: 1 },
     );
   };
 
@@ -108,7 +119,9 @@ const WishlistPage: Component = () => {
       gifted: fields.get("gifted") != null,
     });
     if (!parsed.success) {
-      setEditError(parsed.error.issues[0]?.message ?? "Check your entries and try again.");
+      setEditError(
+        parsed.error.issues[0]?.message ?? "Check your entries and try again.",
+      );
       return;
     }
 
@@ -150,7 +163,9 @@ const WishlistPage: Component = () => {
       name: String(fields.get("name") ?? ""),
     });
     if (!parsed.success) {
-      setCreateError(parsed.error.issues[0]?.message ?? "Check your entries and try again.");
+      setCreateError(
+        parsed.error.issues[0]?.message ?? "Check your entries and try again.",
+      );
       return;
     }
 
@@ -189,6 +204,17 @@ const WishlistPage: Component = () => {
       <Page title="Wishlist" wide>
         <h2>Your wishes:</h2>
 
+        <div class="wish-toolbar">
+          <label>
+            <input
+              type="checkbox"
+              checked={hideGifted()}
+              onChange={(event) => setHideGifted(event.currentTarget.checked)}
+            />
+            Hide gifted wishes
+          </label>
+        </div>
+
         <div class="wish-wrap">
           <table class="wish-table">
             <thead>
@@ -213,7 +239,9 @@ const WishlistPage: Component = () => {
                       >
                         {column.label}
                         <Show when={sort().key == column.key}>
-                          <span aria-hidden="true">{sort().dir == 1 ? "↑" : "↓"}</span>
+                          <span aria-hidden="true">
+                            {sort().dir == 1 ? "↑" : "↓"}
+                          </span>
                         </Show>
                       </button>
                     </th>
@@ -225,20 +253,23 @@ const WishlistPage: Component = () => {
               </tr>
             </thead>
             <tbody>
-              <For each={sorted()}>
+              <For each={sorted()} keyed={(wish) => wish.id}>
                 {(wish, index) => (
                   <Show
-                    when={editingId() == wish.id}
+                    when={editingId() == wish().id}
                     fallback={
                       <tr>
                         <td>{index() + 1}</td>
-                        <td>{wish.name}</td>
-                        <td>{wish.gifted ? "Yes" : "No"}</td>
-                        <td>{wish.gifter ?? "—"}</td>
-                        <td>{formatDate(wish.created_at)}</td>
-                        <td>{formatDate(wish.updated_at)}</td>
+                        <td>{wish().name}</td>
+                        <td>{wish().gifted ? "Yes" : "No"}</td>
+                        <td>{wish().gifter ?? "—"}</td>
+                        <td>{formatDate(wish().created_at)}</td>
+                        <td>{formatDate(wish().updated_at)}</td>
                         <td>
-                          <button type="button" onClick={() => startEdit(wish)}>
+                          <button
+                            type="button"
+                            onClick={() => startEdit(wish())}
+                          >
                             Edit
                           </button>
                         </td>
@@ -247,7 +278,10 @@ const WishlistPage: Component = () => {
                   >
                     <tr>
                       <td colspan={7} class="wish-row-cell">
-                        <form class="wish-row-form" onSubmit={(event) => saveEdit(event, wish)}>
+                        <form
+                          class="wish-row-form"
+                          onSubmit={(event) => saveEdit(event, wish())}
+                        >
                           <Show when={editError()}>
                             <p class="wish-error" role="alert">
                               {editError()}
@@ -256,7 +290,12 @@ const WishlistPage: Component = () => {
 
                           <label>
                             Name
-                            <input name="name" type="text" required value={wish.name} />
+                            <input
+                              name="name"
+                              type="text"
+                              required
+                              defaultValue={wish().name}
+                            />
                           </label>
 
                           <label>
@@ -265,12 +304,16 @@ const WishlistPage: Component = () => {
                               name="gifter"
                               type="text"
                               placeholder="(none)"
-                              value={wish.gifter ?? ""}
+                              defaultValue={wish().gifter ?? ""}
                             />
                           </label>
 
                           <label class="wish-gifted">
-                            <input name="gifted" type="checkbox" checked={wish.gifted} />
+                            <input
+                              name="gifted"
+                              type="checkbox"
+                              defaultChecked={wish().gifted}
+                            />
                             Gifted
                           </label>
 
